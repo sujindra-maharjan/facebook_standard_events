@@ -15,7 +15,7 @@ class FacebookStandardEvents {
       double valueToSum}) {
     final args = {
       'name': name,
-      'parameters': parameters,
+      'parameters': _filterOutNulls(parameters),
       '_valueToSum': valueToSum,
     };
     return _channel.invokeMethod<void>('logEvent', _filterOutNulls(args));
@@ -212,7 +212,7 @@ class FacebookStandardEvents {
       'parameters': parameters,
       'currency': currency
     };
-      return _channel.invokeMethod('logPurchaseEvent', args);
+      return _channel.invokeMethod('logPurchaseEvent', _filterOutNulls(args));
   }
 
   /// Creates a new map containing all of the key/value pairs from [parameters]
