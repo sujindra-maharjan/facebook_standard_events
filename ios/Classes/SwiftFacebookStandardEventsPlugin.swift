@@ -12,10 +12,10 @@ public class SwiftFacebookStandardEventsPlugin: NSObject, FlutterPlugin {
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
     switch call.method {
     case "logEvent":
-        handleLogEvent(call, result)
+        handleLogEvent(call, result: result)
         break;
     case "logPurchaseEvent":
-        handlePurchaseLogEvent(call, result)
+        handlePurchaseLogEvent(call, result: result)
         break;
     default:
         result("iOS " + UIDevice.current.systemVersion)
@@ -40,7 +40,7 @@ public class SwiftFacebookStandardEventsPlugin: NSObject, FlutterPlugin {
         let parameters = arguments["parameters"] as? [String: Any] ?? [String: Any]()
         let currency = arguments["currency"] as! String
 
-        AppEvents.purchased(amount: amount, currency: currency, extraParameters: parameters)
+        AppEvents.logPurchase(purchaseAmount, currency: currency, parameters: parameters)
         
         result(nil)
     }
