@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
 
-import 'package:flutter/services.dart';
 import 'package:facebook_standard_events/facebook_standard_events.dart';
+import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 
 void main() => runApp(MyApp());
 
@@ -12,32 +11,11 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
 
   @override
   void initState() {
     super.initState();
-    initPlatformState();
-  }
-
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    try {
-      platformVersion = await FacebookStandardEvents.platformVersion;
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
-    }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      _platformVersion = platformVersion;
-    });
+   logEvents();
   }
 
   @override
@@ -48,9 +26,39 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
         ),
         body: Center(
-          child: Text('Running on: $_platformVersion\n'),
+          child: RaisedButton(onPressed: ()async {
+            var facebookLogin = FacebookLogin();
+            var result = await facebookLogin.logIn(['email']);
+
+            switch (result.status) {
+              case FacebookLoginStatus.loggedIn:
+                var token = result.accessToken.token;
+                break;
+              case FacebookLoginStatus.cancelledByUser:
+                facebookLogin.logOut();
+                throw ("LoginFailed");
+              case FacebookLoginStatus.error:
+                facebookLogin.logOut();
+                throw ("LoginFailed");
+            }
+          }, child: Text('Login with Facebook'),),
         ),
       ),
     );
+  }
+
+  void logEvents() {
+    ///custom log event
+    FacebookStandardEvents().logEvent(name: 'test_custom_event_ios',parameters: {'id':23123,'test':'erwqads'},valueToSum: 10);
+
+    /// purchase log event
+    FacebookStandardEvents().logPurchaseEvent(10.0, 'USD', {'purchaseID':'ios asdasd qwek3j2j423'});
+
+    ///view content log event
+    FacebookStandardEvents().logViewContentEvent('Live stream channel ios','qweqw1231io2n3ioinon','Livestream',null,null);
+    FacebookStandardEvents().logViewContentEvent('Live stream Recording ios','qweqw1231io2n3ioinon','Video',null,null);
+
+    ///subscribe log event
+    FacebookStandardEvents().logSubscribeEvent('qweqw1231asdwerwefio2n3ioinon','XXX',300);
   }
 }
